@@ -21,7 +21,7 @@ import org.openjdk.jmh.annotations.Warmup;
 @State(Scope.Benchmark)
 public class MyBenchmark {
 
-    private long n = 40;
+    private int n = 40;
 
     @Benchmark
     public long fibSeq() {
@@ -30,6 +30,6 @@ public class MyBenchmark {
 
     @Benchmark
     public long fibPar() {
-        return new Main.Fibonacci(n).compute();
+        return Main.fibonacciParallel(n);
     }
 }

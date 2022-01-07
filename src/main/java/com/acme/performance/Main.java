@@ -1,35 +1,43 @@
 package com.acme.performance;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.RecursiveTask;
-import java.util.function.IntFunction;
+import java.util.*;
+import java.util.concurrent.*;
+import java.util.function.*;
 
 public class Main {
-    public static long fibonacci(long n) {
+    public static long fibonacci(int n) {
         if (n <= 1) {
             return n;
         } else {
             return fibonacci(n - 1) + fibonacci(n - 2);
         }
     }
-    public static class Fibonacci extends RecursiveTask<Long> {
-        final long n;
-        public Fibonacci(long n) {
+
+    private static class Fibonacci extends RecursiveTask<Long> {
+        private final int n;
+        private final byte depth;
+        public Fibonacci(int n) {
+            this(n, 0);
+        }
+        private Fibonacci(int n, int depth) {
+            this.depth = (byte) depth;
             this.n = n;
         }
         public Long compute() {
-            if (n <= 10) {
+            if (depth > 10) {
                 return fibonacci(n);
             }
-            Fibonacci f1 = new Fibonacci(n - 1);
+            Fibonacci f1 = new Fibonacci(n - 1, depth + 1);
             f1.fork();
-            Fibonacci f2 = new Fibonacci(n - 2);
+            Fibonacci f2 = new Fibonacci(n - 2, depth + 1);
             return f2.compute() + f1.join();
         }
     }
+
+    public static Long fibonacciParallel(int n) {
+        return new Fibonacci(n, 0).compute();
+    }
+
     Map<String, List<Long>> results = new HashMap<>();
     void execute(IntFunction<Long> code, int num, String name) {
         long start = System.currentTimeMillis();
